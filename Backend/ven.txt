@@ -1,0 +1,25 @@
+{
+    "vender": {
+        "name": "Pranav",
+        "contact": "9979797",
+        "email": "p7@gmail.com",
+        "password": "$2b$10$dSFG.bDUblDQHdOym24IrOO3ULEi0CZdqYd3NtdEoczcVL3J/1Uz6",
+        "Total_Garbage": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "Prices": [
+            -1,
+            20,
+            -1,
+            -1,
+            -1
+        ],
+        "_id": "66f599231581dc28bb796627",
+        "__v": 0
+    },
+    "message": "Your Account created Successfully"
+}

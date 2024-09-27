@@ -1,0 +1,122 @@
+/* Wrapper for entire dashboard with background color */
+.dashboard-wrapper {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+  }
+  
+  /* Title styling */
+  .title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #333;
+  }
+  
+  /* Container for all the boxes */
+  .dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto;
+    gap: 20px;
+    justify-items: center;
+  }
+  
+  .dashboard-container .box:nth-child(4),
+  .dashboard-container .box:nth-child(5) {
+    grid-column: span 1 / span 2;
+  }
+  
+  /* Base style for each box */
+  .box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    height: 200px;
+    width: 200px;
+    border-radius: 50%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  /* Hover effect */
+  .box:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Individual styles for each box */
+  .paper {
+    background-color: #3498db;
+  }
+  
+  .e-waste {
+    background-color: #e74c3c;
+  }
+  
+  .plastic {
+    background-color: #f1c40f;
+  }
+  
+  .metal {
+    background-color: #8e44ad;
+  }
+  
+  .bio {
+    background-color: #2ecc71;
+  }
+  
+  /* Price text and input inside the box */
+  .price {
+    margin-top: 10px;
+    font-size: 18px;
+  }
+  
+  .price input {
+    width: 80px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+  
+  /* Button styling */
+  button {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border: none;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  button:hover {
+    background-color: #555;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .dashboard-container {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .dashboard-container .box:nth-child(4),
+    .dashboard-container .box:nth-child(5) {
+      grid-column: auto;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dashboard-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  

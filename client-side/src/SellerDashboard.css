@@ -1,0 +1,92 @@
+/* Wrapper for entire dashboard with background color */
+.dashboard-wrapper {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #f5f5f5; /* Light gray background for the dashboard */
+    min-height: 100vh; /* Ensure it covers the full viewport height */
+    box-sizing: border-box;
+  }
+  
+  /* Title styling */
+  .title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 40px;
+    color: #333;
+  }
+  
+  /* Container for all the boxes */
+  .dashboard-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 boxes in the top row */
+    grid-template-rows: auto;
+    gap: 20px;
+    justify-items: center;
+  }
+  
+  .dashboard-container .box:nth-child(4),
+  .dashboard-container .box:nth-child(5) {
+    grid-column: span 1 / span 2; /* Last two items take 2 columns */
+  }
+  
+  /* Base style for each box, now as circles */
+  .box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: white;
+    height: 200px;
+    width: 200px;
+    text-align: center;
+    border-radius: 50%; /* Turns the box into a circle */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    cursor: pointer;
+  }
+  
+  /* Box hover effect */
+  .box:hover {
+    transform: scale(1.05);
+  }
+  
+  /* Individual styles for each box */
+  .paper {
+    background-color: #3498db; /* Light Blue */
+  }
+  
+  .e-waste {
+    background-color: #e74c3c; /* Red */
+  }
+  
+  .plastic {
+    background-color: #f1c40f; /* Yellow */
+  }
+  
+  .metal {
+    background-color: #8e44ad; /* Purple */
+  }
+  
+  .bio {
+    background-color: #2ecc71; /* Green */
+  }
+  
+  /* Responsive design to stack boxes on smaller screens */
+  @media (max-width: 768px) {
+    .dashboard-container {
+      grid-template-columns: repeat(2, 1fr); /* Stack 2 per row on small screens */
+    }
+  
+    .dashboard-container .box:nth-child(4),
+    .dashboard-container .box:nth-child(5) {
+      grid-column: auto; /* Reset column span for smaller screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dashboard-container {
+      grid-template-columns: 1fr; /* Stack 1 per row on extra small screens */
+    }
+  }
+  

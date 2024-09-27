@@ -1,0 +1,19 @@
+{
+    "seller": {
+        "name": "Pranav",
+        "email": "p1@gmail.com",
+        "password": "$2b$10$txvIk.iokmfRdofJ3ZO9kepkcYS6KwKj.dzrfbrf5HYUGn0Wul3ku",
+        "contact": "9979797",
+        "address": "Sagaon",
+        "scores": [
+            0,
+            0,
+            0,
+            0,
+            0
+        ],
+        "_id": "66f58eda2f6c170138311951",
+        "__v": 0
+    },
+    "message": "Your Account created Successfully"
+}
