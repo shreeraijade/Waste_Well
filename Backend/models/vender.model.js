@@ -20,6 +20,10 @@ const VenderSchema = mongoose.Schema({
         required : true,
         unique : true
     },
+    address :{
+        type: String,
+        required : true
+    },
     password :{
         type : String,
         required : true
@@ -33,10 +37,18 @@ const VenderSchema = mongoose.Schema({
         default : [-1,20,-1,-1,-1]
     },
 
+    Notifications : {
+        type : [Object]
+    }
+
 
 
 
 })
+
+VenderSchema.methods.isPasswordCorrect=function(password){
+    return  bcrypt.compare(password,this.password)
+ }
 
 VenderSchema.pre("save",async function(next) {
     if(!this.isModified("password")) return next();

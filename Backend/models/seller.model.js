@@ -32,9 +32,17 @@ const SellerSchema = mongoose.Schema({
       scores : {
         type : [Number],
         default : [0,0,0,0,0]
+      },
+
+      Notifications : {
+        type : [Object]
       }
 
 });
+
+SellerSchema.methods.isPasswordCorrect=function(password){
+   return  bcrypt.compare(password,this.password)
+}
 
 SellerSchema.pre("save",async function(next) {
     if(!this.isModified("password")) return next();
