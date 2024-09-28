@@ -1,5 +1,6 @@
 import { Seller } from "../models/seller.model.js";
 import { Vender } from "../models/vender.model.js"
+import { Blog } from "../models/blogs.model.js";
 
 const generateTokens = async function(userId){
     try {
@@ -246,6 +247,9 @@ const sentconfirmMessagetoSeller=async function(req,res){
        vendor_user.Notifications=arr;
        await vendor_user.save()
 
+       vendor_user.Total_Garbage[category_number-1]=vendor_user.Total_Garbage[category_number-1]+weight;
+       await vendor_user.save()
+
         const message=`Dear ${seller.name} your Request for ${category} for ${weight}kg is accepted by ${vendor_user.name}, Our member will come to your address - ${user_address} at your mentioned date`;
 
         seller.Notifications.push(message);
@@ -266,6 +270,62 @@ const sentconfirmMessagetoSeller=async function(req,res){
     }
 }
 
+const givingGarbageArray=async function(req,res){
+    try {
+
+        const user=req.user
+        if(!user){
+            throw new Error("error while fetching user")
+        }
+
+        let garbageArray = await user.Total_Garbage;
+
+        res.status(200).json({garbageArray:garbageArray,message:"garbages collection of this vendor"})
+
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+}
+
+const AddBlog = async function(req,res){
+    try {
+        const {title,description}=req.body
+
+        if(!title || !description){
+            throw new Error("missing fields")
+        }
+
+        const blog=await Blog.create({title,description})
+
+        res.status(200).json({message:"blag added successfully",blog:blog});
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+}
+
+const getAllBlogs = async function(req,res){
+    try {
+
+        const blogs=await Blog.find()
+        let arr=[...blogs]
+        let arrblogs=arr.reverse()
 
 
-export {signupVender,garbagePriceUpdate,givingListForGarbage,loginVendor,logoutvendor,getcurrentVendor,sentRejectMessageToSeller,sentconfirmMessagetoSeller}
+
+        res.status(200).json({message:"all blogs are fetched successfully",arrblogs:arrblogs})
+        
+    } catch (error) {
+        
+    }
+}
+
+
+
+
+export {signupVender,garbagePriceUpdate,givingListForGarbage,loginVendor,logoutvendor,getcurrentVendor,sentRejectMessageToSeller,sentconfirmMessagetoSeller,givingGarbageArray,AddBlog,getAllBlogs}
+
+/*
+
+*/ 

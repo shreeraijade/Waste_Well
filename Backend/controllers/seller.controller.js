@@ -1,3 +1,4 @@
+import { Blog } from "../models/blogs.model.js";
 import { Seller } from "../models/seller.model.js"
 import { Vender } from "../models/vender.model.js";
 
@@ -183,7 +184,73 @@ const RequestTovendor=async function(req,res){
     }
 }
 
+const givingScores = async function(req,res){
+    try {
+        const user=req.user
+
+        if(!user){
+            throw new Error("error while fetching user")
+        }
+
+        let scores=await user.scores
+
+        res.status(200).json({message:"scores fetched successfully",scores:scores})
+
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
+        console.log(error)
+    }
+}
+
+const AddBlog = async function(req,res){
+    try {
+        const {title,description}=req.body
+
+        if(!title || !description){
+            throw new Error("missing fields")
+        }
+
+        const blog=await Blog.create({title,description})
+
+        res.status(200).json({message:"blag added successfully",blog:blog});
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+}
+
+const getLeaderBoaredArray = async function(req,res){
+    try {
+
+        const sellers = await Seller.find()
+        let arr=[...sellers];
+        let arr2;
+
+       arr2= arr.map((ele)=>{
+            let sum=0;
+            ele.scores.map((score)=>{
+                sum=sum+score
+            })
+            return {
+                sum:sum,
+                email:ele.email,
+                name:ele.name
+            }
+
+        })
+
+        arr2.sort((a, b) => b.sum - a.sum);
+
+        res.status(200).json({message:"leaderBoard fetched successfully",leaderArray:arr2})
+
+        
+    } catch (error) {
+        res.status(500).json({message:"error while fetching leaderBoard"})
+    }
+}
 
 
 
-export {signupseller,loginseller,logoutSeller,getCurrentSeller,RequestTovendor}
+
+export {signupseller,loginseller,logoutSeller,getCurrentSeller,RequestTovendor,givingScores,AddBlog,getLeaderBoaredArray}
