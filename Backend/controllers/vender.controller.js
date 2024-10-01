@@ -246,6 +246,9 @@ const sentconfirmMessagetoSeller=async function(req,res){
        vendor_user.Notifications=arr;
        await vendor_user.save()
 
+       vendor_user.Total_Garbage[category_number-1]=vendor_user.Total_Garbage[category_number-1]+weight;
+       await vendor_user.save()
+
         const message=`Dear ${seller.name} your Request for ${category} for ${weight}kg is accepted by ${vendor_user.name}, Our member will come to your address - ${user_address} at your mentioned date`;
 
         seller.Notifications.push(message);
@@ -270,41 +273,5 @@ const sentconfirmMessagetoSeller=async function(req,res){
 }
 
 
-const AddBlog = async function(req,res){
-    try {
-        const {title,description}=req.body
-        const user=req.user
 
-        if(!title || !description){
-            throw new Error("missing fields")
-        }
-
-        const blog=await Blog.create({title,description,user_email:user.email})
-
-        res.status(200).json({message:"blag added successfully",blog:blog});
-        
-    } catch (error) {
-        res.status(500).json({error:error.message})
-    }
-}
-
-const getAllBlogs = async function(req,res){
-    try {
-
-        const blogs=await Blog.find()
-        let arr=[...blogs]
-        let arrblogs=arr.reverse()
-
-
-
-        
-        res.status(200).json({message:"all blogs are fetched successfully",arrblogs:arrblogs})
-        
-    } catch (error) {
-        
-    }
-}
-
-
-
-export {getAllBlogs, AddBlog, signupVender,garbagePriceUpdate,givingListForGarbage,loginVendor,logoutvendor,getcurrentVendor,sentRejectMessageToSeller,sentconfirmMessagetoSeller}
+export {signupVender,garbagePriceUpdate,givingListForGarbage,loginVendor,logoutvendor,getcurrentVendor,sentRejectMessageToSeller,sentconfirmMessagetoSeller}
