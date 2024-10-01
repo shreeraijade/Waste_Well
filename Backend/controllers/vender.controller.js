@@ -1,5 +1,6 @@
 import { Seller } from "../models/seller.model.js";
 import { Vender } from "../models/vender.model.js"
+import { Blog } from "../models/blogs.model.js";
 
 const generateTokens = async function(userId){
     try {
@@ -50,16 +51,11 @@ const signupVender = async function(req,res){
             throw new error("problem while creating account")
         }
 
-        const options = {
-            httpOnly : true,
-            secure : true
-        }
-
         const {accesstoken,refreshtoken} = await generateTokens(vender._id);
 
-        res .cookie("accesstoken",accesstoken,options)
-        .cookie("refreshtoken",refreshtoken,options)
-        .status(200).json({vender, message: "Your Account created Successfully"})
+        res .cookie("accesstoken",accesstoken)
+        .cookie("refreshtoken",refreshtoken)
+        .status(200).json({user:vender, message: "Your Account created Successfully", type:"Vendor"})
        
         
      } catch (error) {
@@ -68,33 +64,35 @@ const signupVender = async function(req,res){
      }
 }
 
-const garbagePriceUpdate = async function(req,res){
+const garbagePriceUpdate = async function(req, res) {
     try {
-        const {GarbageNo, Price, venderid} = req.body
+        const { GarbageNo, Price, vendorid } = req.body;
 
-        if(!GarbageNo || !Price){
-            throw new Error("Fields are missing")
+        // Validate the input fields
+        if (!GarbageNo || !Price || !vendorid) {
+            return res.status(400).json({ error: "Required fields are missing" });
         }
 
-        // console.log(vendor)
+        // Find the vendor by ID
+        const user = await Vender.findById(vendorid); // Assuming 'Vendor' is the correct model name
+        console.log(user);
+        if (!user) {
+            return res.status(404).json({ error: "Vendor not found" });
+        }
 
-        
+        // Update the price for the specified garbage type
+        user.Prices[GarbageNo - 1] = Price;
 
-        const user=await Vender.findById(venderid);
-        user.Prices[GarbageNo-1]=Price
+        // Save the updated user information
+        await user.save();
 
-        user.save()
+        return res.status(200).json({ message: "Your prices have been updated" });
 
-        res.status(200).json({message : "Your prices are updated"})
-
-
-
-        
-        
     } catch (error) {
-        console.log(error)
+        console.error(error);
+        return res.status(500).json({ error: "Internal server error" });
     }
-}
+};
 
 const givingListForGarbage = async function(req,res){
     try {
@@ -147,9 +145,9 @@ const loginVendor=async function(req,res){
 
         const {accesstoken,refreshtoken}=await generateTokens(user._id)
 
-        res.cookie("accesstoken",accesstoken,options)
-        .cookie("refreshtoken",refreshtoken,options)
-        .status(200).json({user,message: "seller logged in successfully"})
+        res.cookie("accesstoken",accesstoken)
+        .cookie("refreshtoken",refreshtoken)
+        .status(200).json({user: user, message: "vendor logged in successfully", type: "Vendor"})
         
     } catch (error) {
         console.log(error)
@@ -176,12 +174,13 @@ const logoutvendor=async function(req,res){
 const getcurrentVendor=async function(req,res){
     try {
         const user=req.user;
+        
 
         if(!user){
             throw new Error("error while fetching the current vendor")
         }
 
-        res.status(200).json({user,message:"seller fetched successfully"})
+        res.status(200).json({user: user,message:"vendor fetched successfully",type:"Vendor"})
         
     } catch (error) {
         console.log(error)
@@ -214,7 +213,7 @@ const sentRejectMessageToSeller=async function(req,res){
         vendor_user.save()
 
 
-        res.status(200).json({accepted:false,message:message})
+        res.status(200).json({accepted:false,message:message, user:vendor_user})
 
 
         
@@ -230,6 +229,7 @@ const sentconfirmMessagetoSeller=async function(req,res){
         const {user_email, RequestId, category, weight, user_address,category_number}=req.body
         const vendor_user=req.user
         // console.log(user_email)
+        let weight2=Number(weight)
 
         
 
@@ -250,13 +250,16 @@ const sentconfirmMessagetoSeller=async function(req,res){
 
         seller.Notifications.push(message);
         await seller.save();
-        let price=vendor_user.Prices[category_number-1];
-        price=price*weight 
+        let price=vendor_user.Prices[category_number];
+        price=price*weight2
+        vendor_user.Total_Garbage[category_number] = vendor_user.Total_Garbage[category_number] + weight2;
 
-        seller.scores[category_number-1]=seller.scores[category_number-1]+price;
+        await vendor_user.save();
+
+        seller.scores[category_number]=seller.scores[category_number]+price;
         await seller.save();
 
-        res.status(200).json({accepted:true,message:"confirm message sent to user"})
+        res.status(200).json({accepted:true,message:"confirm message sent to user", user:vendor_user})
 
 
         
@@ -267,5 +270,41 @@ const sentconfirmMessagetoSeller=async function(req,res){
 }
 
 
+const AddBlog = async function(req,res){
+    try {
+        const {title,description}=req.body
+        const user=req.user
 
-export {signupVender,garbagePriceUpdate,givingListForGarbage,loginVendor,logoutvendor,getcurrentVendor,sentRejectMessageToSeller,sentconfirmMessagetoSeller}
+        if(!title || !description){
+            throw new Error("missing fields")
+        }
+
+        const blog=await Blog.create({title,description,user_email:user.email})
+
+        res.status(200).json({message:"blag added successfully",blog:blog});
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
+    }
+}
+
+const getAllBlogs = async function(req,res){
+    try {
+
+        const blogs=await Blog.find()
+        let arr=[...blogs]
+        let arrblogs=arr.reverse()
+
+
+
+        
+        res.status(200).json({message:"all blogs are fetched successfully",arrblogs:arrblogs})
+        
+    } catch (error) {
+        
+    }
+}
+
+
+
+export {getAllBlogs, AddBlog, signupVender,garbagePriceUpdate,givingListForGarbage,loginVendor,logoutvendor,getcurrentVendor,sentRejectMessageToSeller,sentconfirmMessagetoSeller}

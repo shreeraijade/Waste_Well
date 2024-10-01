@@ -34,7 +34,7 @@ const VenderSchema = mongoose.Schema({
     },
     Prices :{
         type : [Number],
-        default : [-1,20,-1,-1,-1]
+        default : [-1,-1,-1,-1,-1]
     },
 
     Notifications : {

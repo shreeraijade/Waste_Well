@@ -1,5 +1,6 @@
 import { Seller } from "../models/seller.model.js"
 import { Vender } from "../models/vender.model.js";
+import { Blog } from "../models/blogs.model.js";
 
 
 const generateTokens = async function(userId){
@@ -28,7 +29,7 @@ const signupseller = async function(req,res){
         const {name,email,password,address,contact} = req.body 
 
         if(!name || !email || !password || !address || !contact){
-            throw new error('Some fields are miising')
+            throw new Error('Some fields are miising')
         }
 
         const user = await Seller.findOne({
@@ -36,7 +37,7 @@ const signupseller = async function(req,res){
         })
 
         if(user){
-            throw new error("user with this email already exist")
+            throw new Error("user with this email already exist")
         }
 
         const seller = await Seller.create({
@@ -44,7 +45,7 @@ const signupseller = async function(req,res){
         })
 
         if(!seller){
-            throw new error("problem while creating account")
+            throw new Error("problem while creating account")
         }
 
         const options = {
@@ -55,9 +56,9 @@ const signupseller = async function(req,res){
         const {accesstoken,refreshtoken} = await generateTokens(seller._id);
 
         res
-        .cookie("accesstoken",accesstoken,options)
-        .cookie("refreshtoken",refreshtoken,options)
-        .status(200).json({seller})
+        .cookie("accesstoken",accesstoken)
+        .cookie("refreshtoken",refreshtoken)
+        .status(200).json({user:seller, type: "Seller"})
         
         
      } catch (error) {
@@ -65,9 +66,41 @@ const signupseller = async function(req,res){
      }
 }
 
+
+const getLeaderBoaredArray = async function(req,res){
+    try {
+
+        const sellers = await Seller.find()
+        let arr=[...sellers];
+        let arr2;
+
+       arr2= arr.map((ele,index)=>{
+            let sum=0;
+            ele.scores.map((score)=>{
+                sum=sum+score
+            })
+            return {
+                
+                sum:sum,
+                email:ele.email,
+                name:ele.name
+            }
+
+        })
+
+        arr2.sort((a, b) => b.sum - a.sum);
+
+        res.status(200).json({message:"leaderBoard fetched successfully",leaderArray:arr2})
+
+        
+    } catch (error) {
+        res.status(500).json({message:"error while fetching leaderBoard"})
+    }
+}
+
 const loginseller=async function(req,res){
     try {
-        const {email,password}=req.body
+        const { email, password }=req.body
         if(!email){
             throw new Error("email is missing")
         }
@@ -94,12 +127,30 @@ const loginseller=async function(req,res){
 
         const {accesstoken,refreshtoken}=await generateTokens(seller._id)
 
-        res.cookie("accesstoken",accesstoken,options)
-        .cookie("refreshtoken",refreshtoken,options)
-        .status(200).json({seller,message: "seller logged in successfully"})
+        res.cookie("accesstoken",accesstoken)
+        .cookie("refreshtoken",refreshtoken)
+        .status(200).json({user:seller,message: "seller logged in successfully", type: "Seller"})
         
     } catch (error) {
         console.log(error)
+    }
+}
+
+const AddBlog = async function(req,res){
+    try {
+        const {title,description}=req.body
+        const user=req.user
+
+        if(!title || !description){
+            throw new Error("missing fields")
+        }
+
+        const blog=await Blog.create({title,description,user_email:user.email})
+
+        res.status(200).json({message:"blag added successfully",blog:blog});
+        
+    } catch (error) {
+        res.status(500).json({error:error.message})
     }
 }
 
@@ -139,7 +190,7 @@ const getCurrentSeller=async function(req,res){
 const RequestTovendor=async function(req,res){
     try {
 
-        const {day,month,year,weight,category,vendor_email}=req.body 
+        const {date,weight,category,vendor_email}=req.body 
         const user=req.user
 
         if(!user){
@@ -163,9 +214,7 @@ const RequestTovendor=async function(req,res){
             "user_id":user._id,
             "category" : category,
             "weight" : weight,
-            "day" : day,
-            "month" : month,
-            "year" : year,
+            "date": date,
             "confirmed" : false,
             "rejected" : false
 
@@ -183,7 +232,81 @@ const RequestTovendor=async function(req,res){
     }
 }
 
+const getAllBlogs = async function(req,res){
+    try {
+
+        const blogs=await Blog.find()
+        let arr=[...blogs]
+        let arrblogs=arr.reverse()
 
 
 
-export {signupseller,loginseller,logoutSeller,getCurrentSeller,RequestTovendor}
+        
+        res.status(200).json({message:"all blogs are fetched successfully",arrblogs:arrblogs})
+        
+    } catch (error) {
+        
+    }
+}
+
+const getrank = async function(req,res){
+    try {
+        const user=req.user 
+        const sellers = await Seller.find()
+        let arr=[...sellers];
+        let arr2;
+
+       arr2= arr.map((ele,index)=>{
+            let sum=0;
+            ele.scores.map((score)=>{
+                sum=sum+score
+            })
+            return {
+                
+                sum:sum,
+                email:ele.email,
+                name:ele.name
+            }
+
+        })
+
+        arr2.sort((a, b) => b.sum - a.sum);
+
+        let rank=0;
+        arr2.map((ele,ind)=>{
+            if(ele.email==user.email){
+                rank=ind+1;
+            }
+        })
+
+        res.status(200).json({message:"rank fetched successfully",rank:rank})
+        
+    } catch (error) {
+        res.status(500).json({message:"error while fetching rank",error:error.message})
+        console.log(error)
+    }
+}
+
+const editUser = async function(req,res) {
+    try {
+        const user=req.user
+        const type=req.type
+        const {name,contact}=req.body 
+
+        user.name=name?name:user.name
+        user.contact=contact?contact:user.contact
+        user.save()
+
+        res.status(200).json({message:"user edited successfully", user:user,type:type})
+
+
+        
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
+
+export {editUser, getrank, getLeaderBoaredArray, getAllBlogs, AddBlog, signupseller,loginseller,logoutSeller,getCurrentSeller,RequestTovendor}
